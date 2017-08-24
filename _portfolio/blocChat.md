@@ -2,7 +2,7 @@
 layout: post
 title: BlocChat
 thumbnail-path: "/img/blocChat/BlocChat_frontPage.png"
-short-description: BlocChat is a basic messaging system that allows for username login, chatroom creation, and messaging
+short-description: BlocChat is a messaging web application I built to learn the Angular framework and the fundamentals of Firebase
 
 ---
 
@@ -133,7 +133,7 @@ Message.send = function() {
 
 ## Results
 
-The application passed all requirements of the Bloc assignment with flying colors. Aside from some design choices I might reconsider now, I was very pleased with the final products functionality. Once I was able to re-focus the work after getting a better understanding of some of the new tech I was working with,things clicked into place. Firebase in particular gave me some early issues, but I was able to work all of that out with some extra work on the documentation.
+The application passed all requirements of the Bloc assignment with flying colors. Aside from some design choices I might reconsider now, I was very pleased with the final application's functionality. Once I was able to re-focus the work after getting a better understanding of some of the new tech I was working with,things clicked into place. Firebase in particular gave me some early issues, but I was able to work all of that out with some extra work on the documentation.
 
 ## Conclusion
 

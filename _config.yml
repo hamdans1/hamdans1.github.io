@@ -10,8 +10,8 @@ theme_settings:
 
   # Header and footer text
   header_text: >
-     <h1>Programmer and Politico</h1>
-     <p>Frontend developer specialized in AngularJS and Ruby</p>
+     <h1>Web Developer</h1>
+     <p>Full Stack Developer specialized in AngularJS and Rails</p>
   header_text_feature_image:
   footer_text: >
    Powered by <a href="http://jekyllrb.com">Jekyll</a>
@@ -22,9 +22,9 @@ theme_settings:
   behance:
   bitbucket:
   dribbble:
-  facebook: "samhamdan"
+  facebook: "sam.hamdan.965"
   flickr:
-  github: # github profile name, e.g. "madebymunsters"
+  github: "hamdans1"
   google_plus:
   instagram:
   linkedin:  "https://www.linkedin.com/in/sami-hamdan-74520b31/" # Full URL
