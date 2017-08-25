@@ -40,9 +40,8 @@ Before I could get started with building out the application, I had to come up w
 7. I want to create a data association between users, posts, and comments.
 8. I want to create authorized roles within the application, and allow for admins to create topics.
 9. I want to implement a Vote model to allow users to upvote and downvote different posts, topics, and comments. 
-10. I want to implement a Favorite model and functionality to allow users to favorite certain posts or comments.
-11. I want users to receieve an email when there is a comment or change on a favorited post. 
-12. I want users to have a viewable public profile. 
+10. I want to implement a Favorite model to allow users to tag posts as and get an email after a comment is made on a favorite post.
+11. I want users to have a viewable public profile. 
 
 ### User Story 1: Post Model
 
@@ -383,6 +382,83 @@ My call on post.updateRank was wishful coding so I went back to my Post model an
     ...
 end
 ```
+![Sammit Topic Posts view](/img/Sammit/TopicsPosts.png)
 
 ### User Story 10: Favoriting and ActiveMailer
 
+In addition to the vote system, I wanted users to be able to tag a post as a favorite and be notified when a post receives a new comment. I need to generate a model that would track which posts a user has favorited. I need to add a 'favorite' button on posts that would allow users to flag a favorite. Finally I wanted to add a notification feature that sent an email to users when one of their favorited posts got a new comment. 
+
+Generating the model was simple enough. My model wouldn't need any unique attributes as it would only need to references users and posts. The model would also require a 'belongs_to' association with both users and posts. 
+
+I then added a #favoriteFor method on my User model that would determine if a post had been favorited by a user.
+
+```ruby
+    def favorite_for(post)
+        favorites.where(post_id: post.id).first
+    end
+```
+
+My next step was to generate a FavoritesController and edit my route resources. I nested my favorites routes in my posts, similarly to comments. Once that was done, I created a partial I could add to my post show view and I moved on to develop the methods in my controller.
+
+```ruby
+<% if favorite = current_user.favorite_for(post) %>
+    <%= link_to [post,favorite], class: 'btn btn-danger', method: :delete do %>
+        <i class= "glyphicon glyphicon-star-empty"> </i>&nbsp; Unfavorite
+    <% end %>
+<% else %>
+    <%= link_to [post, Favorite.new], class: 'btn btn-primary', method: :post do %>
+    <i class="glyphicon glyphicon-star"> </i>&nbsp; Favorite
+    <% end %>
+<% end %>
+```
+
+I wanted Sammit to send an email when a favorited post received a new comment, to do that I installed SendGrid via heroku.  After attaching my Heroku login to SendGrid I edited my enivornment configs and added a setup_mail initializer. To protect sensitive data in my config files from being accessible on GitHub, I decided to use the Figaro gem. 
+
+The final step would be implementing a Favorite mailer. I used `$ rails generate mailer Favorite Mailer` to create my mailer. I set my personal email as the default email address and added two methods: newComment would send when a favorited post received a new comment, and newPost would send when a favorited user posted a new post. I also made sure when creating my corresponding favorite mailer views to use both html and plain text to support all email clients. 
+
+```ruby
+class FavoriteMailer < ApplicationMailer
+    default from: "samihamdan00@gmail.com"
+    
+    def new_comment(user, post, comment)
+        
+        headers["Message-ID"] = "<comments/#{comment.id}@pure-cliffs-33222.herokuapp.com>"
+        headers["In-Reply-To"] = "<post/#{post.id}@pure-cliffs-33222.herokuapp.com>"
+        headers["References"] = "<post/#{post.id}@pure-cliffs-33222.herokuapp.com>"
+        
+        @user = user
+        @post = post
+        @comment = comment
+        
+        mail(to: user.email, subject: "New comment on #{post.title}")
+    end
+    
+    def new_post(post)
+        
+        headers["Message-ID"] = "<posts/#{post.id}@pure-cliffs-33222.herokuapp.com"
+        headers["In-Reply-To"] = "<post/#{post.id}@pure-cliffs-33222.herokuapp.com>"
+        headers["References"] = "<post/#{post.id}@pure-cliffs-33222.herokuapp.com>"
+        
+        @post = post
+        
+        mail(to: post.user.email, subject: "You're following #{post.title}")
+    end
+    
+end
+```
+Finally I added a private callback to my Comment model to handle repeat functions and I added a favoritePost function to my Post model to handle favorite creation. 
+
+![Sammit Post view with Favorites](/img/Sammit/Sammit-My Post.png)
+```ruby
+    def favorite_for(post)
+        favorites.where(post_id: post.id).first
+    end
+```
+```ruby
+    def favorite_post
+        Favorite.create(post: self, user: self.user)
+        FavoriteMailer.new_post(self).deliver_now
+    end
+```
+
+### User Story 11: User Profiles
