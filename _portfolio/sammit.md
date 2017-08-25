@@ -1,12 +1,12 @@
 ---
 layout: post
 title: Sammit
-thumbnail-path: 
+thumbnail-path: "/img/Sammit/Sammit-Frontpage.png"
 short-description: Sammit is a Reddit replica I built to learn the fundamentals of back end programming and the Ruby on Rails framework
 ---
 
 {:.center}
-![]({{ site.basurl }}/img/sammit/sammit-frontpage.png)
+![]({{ site.basurl }}/img/Sammit/Sammit-Frontpage.png)
 
 ## What is Sammit?
 
@@ -271,4 +271,118 @@ After creating my topics and editing my routes, I wanted to be sure to add an au
 My last step here was to update my seeds.rb file to include my new associations, and to allow for the creation of topics.
 
 ### User Story 9: Upvotes and Downvotes
+
+Like Reddit, I wanted to implement some sort of voting structure so that I could sort posts according to their popularity ranking. I had to create a Vote model to handle vote data and associate that with User and Post models. I wanted to add UI elements that allow users to vote, but limit those votes to only once per post. And I wanted to sort posts in the order of vote totals, but develop a basic time-decay algorithm to keep fresh posts on top.
+
+First I generated the model using ` $ rails g model Vote value:integer user:references:index post:references:index`.
+
+Then I updated my three relevant models to include hasMany and belongsTo associations between the three. Once I had done that I could implement #upVotes, #downVotes, and #points methods in my Post model. These were relatively simple methods using `where(value:).count` to assign votes, and `.sum(:value)` to call points. 
+
+```ruby
+    def up_votes
+        votes.where(value:1).count
+    end
+    
+    def down_votes
+        votes.where(value:-1).count
+    end
+    
+    def points
+        votes.sum(:value)
+    end
+```
+
+My next step was to generate a VotesController and create a partial view that I could render on my posts show view. The partial linked to POST routes for upVote and downVote and I used a basic bootstrap glyphicon for graphics. I had to adapt my resource routing to this include these vote routes without adding unnecessary additional routes:
+
+```ruby
+Rails.application.routes.draw do
+  resources :topics do
+    resources :posts, except: [:index]
+  end
+  
+  
+  resources :posts, only: [] do
+    resources :comments, only: [:create, :destroy]
+    
+    post '/up-vote' => 'votes#up_vote', as: :up_vote
+    post '/down-vote' => 'votes#down_vote', as: :down_vote
+  end
+  
+  resources :users, only: [:new, :create, :show]
+  
+  resources :sessions, only: [:new, :create, :destroy]
+
+  get 'about' => 'welcome#about'
+
+  root 'welcome#index'
+  
+end
+```
+
+I included two methods for upVote and downVote in my votes controller that both called on a private method for updateVote. 
+
+```ruby
+class VotesController < ApplicationController
+    before_action :require_sign_in
+    
+    def up_vote
+        update_vote(1)
+        redirect_to :back
+    end
+    
+    def down_vote
+        update_vote(-1)
+        redirect_to :back
+    end
+    
+    private
+    
+    def update_vote(new_value)
+        @post = Post.find(params[:post_id])
+        @vote = @post.votes.where(user_id: current_user.id).first
+        
+        if @vote
+            @vote.update_attribute(:value, new_value)
+        else
+            @vote = current_user.votes.create(value: new_value, post: @post)
+        end
+    end
+    
+end
+```
+The last piece to the puzzle was implementing the ranking system. My first step was to add a rank attribute to my Post table and migrate. I added an afterSave callback method to my Vote model and a private updatePost method. 
+
+```ruby
+class Vote < ActiveRecord::Base
+  belongs_to :user
+  belongs_to :post
+  after_save :update_post
+  
+  validates :value, inclusion: { in: [-1,1], message: "%{value} is not a valid vote."}, presence: true
+  
+  private
+  
+  def update_post
+    post.update_rank
+  end
+  
+end
+```
+
+My call on post.updateRank was wishful coding so I went back to my Post model and implemented updateRank and added a default_scope to order by rank. Once that was done I only needed to update my seeds.rb file to include voting and I was done implementing voting.
+
+```ruby
+    default_scope {order('rank DESC')}
+    scope :visible_to, -> (user) {user ? all : joins(:topic).where('topics.public' => true) }
+    ...
+    def update_rank
+        age_in_days = (created_at - Time.new(1970,1,1)) / 1.day.seconds
+        new_rank = points + age_in_days
+        update_attribute(:rank, new_rank)
+    end
+    ...
+end
+```
+
+### User Story 10: Favoriting and ActiveMailer
 
