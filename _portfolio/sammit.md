@@ -512,7 +512,7 @@ Finally, I updated my show view so that it would display the users gravatar, the
 ## Results
 
 An important note here, throughout this process I was first developing each step using TDD and rspec. I chose not to include these steps here in my user stories because I didn't want the length to get too carried away. All of my spec files and the rest of Sammit can be found on the public Github repo. 
-[github repo](https://github.com/hamdans1/bloccit "Sammit")
+[Github Repo](https://github.com/hamdans1/bloccit)
 
 I was very pleased with what I came up with for Sammit. I achieved all of my development goals from when I started out. In the future I'd like to return to update some of the wireframes and stylesheets for the application to see what I could make it look like. I might also return to add some different features like a TipJar(reddit gold) or a premium role to go with standard and admin that could have some alternative access. 
 
@@ -522,6 +522,6 @@ Sammit challenged me in a wide range of ways. This was my first Rails applicatio
 
 If you don't want to fork the repo and take a look under the hood, you can poke around Sammit on via heroku using this link:
 
-[heroku link](https://pure-cliffs-33222.herokuapp.com "Sammit")
+[Heroku Link](https://pure-cliffs-33222.herokuapp.com)
 
 Thanks so much for reading and I hoped you learned something from my work here!
