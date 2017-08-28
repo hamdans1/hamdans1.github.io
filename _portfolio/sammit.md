@@ -382,7 +382,7 @@ My call on post.updateRank was wishful coding so I went back to my Post model an
     ...
 end
 ```
-![Sammit Topic Posts view](/img/Sammit/TopicsPosts.png)
+![Sammit Topic Posts view](/img/Sammit/Sammit-TopicsPosts.png)
 
 ### User Story 10: Favoriting and ActiveMailer
 
@@ -448,7 +448,6 @@ end
 ```
 Finally I added a private callback to my Comment model to handle repeat functions and I added a favoritePost function to my Post model to handle favorite creation. 
 
-![Sammit Post view with Favorites](/img/Sammit/Sammit-My Post.png)
 ```ruby
     def favorite_for(post)
         favorites.where(post_id: post.id).first
@@ -460,5 +459,63 @@ Finally I added a private callback to my Comment model to handle repeat function
         FavoriteMailer.new_post(self).deliver_now
     end
 ```
+![Sammit Post view with Favorites](/img/Sammit/Sammit-My Post.png)
 
 ### User Story 11: User Profiles
+The last piece I wanted to implement was a user profile. I wanted users to be able to publicly share their Sammit contributions by displaying basic user info and a list of posts and comments. I needed to develop a #show method on my UsersController and build out the corresponding view. I also wanted to implement gravatar functionality so that users would have a picture id on their profile and around their login info. 
+
+I used my #show method to assign instance variables for @user and @posts that I could call on my show view. 
+```ruby
+    def show
+        @user = User.find(params[:id])
+        @posts = @user.posts.visible_to(current_user)
+    end
+```
+I implemented gravatar by adding a #avatar_url method on my User model. Following the Gravatar how-to, I created the md5 hash and assigned it to a new variable, and then I compiled the URL so that it coule be called in the URL with a size parameter.
+```ruby
+    def avatar_url(size)
+        gravatar_id = Digest::MD5::hexdigest(self.email).downcase
+        "http://gravatar.com/avatar/#{gravatar_id}.png?s=#{size}"
+    end
+```
+Finally, I updated my show view so that it would display the users gravatar, their post history, and their comment history. 
+```ruby
+<div class="row">
+    <div class="col-md-8">
+        <div class="media">
+            <br />
+            <% avatar_url = @user.avatar_url(128) %>
+            <% if avatar_url %>
+                <div class="media-left">
+                    <%= image_tag avatar_url, class: 'media-object' %>
+                </div>
+            <% end %>
+            <div class="media-body">
+                <h2 class="media-heading"><%= @user.name %></h2>
+                <small>
+                    <%= pluralize(@user.posts.count, 'post') %>,
+                    <%= pluralize(@user.comments.count, 'comment') %>
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h2>Posts</h2>
+<%= render @user.posts %>
+
+<h2>Comments</h2>
+<%= render @user.comments %>
+```
+![Sammit Profile view](/img/Sammit/Sammit-Profile Page.png)
+
+## Results
+
+An important note here, throughout this process I was first developing each step using TDD and rspec. I chose not to include these steps here in my user stories because I didn't want the length to get too carried away. All of my spec files and the rest of Sammit can be found on the public Github repo. 
+[github repo](https://github.com/hamdans1/bloccit "Sammit")
+
+I was very pleased with what I came up with for Sammit. I achieved all of my development goals from when I started out. In the future I'd like to return to update some of the wireframes and stylesheets for the application to see what I could make it look like. I might also return to add some different features like a TipJar(reddit gold) or a premium role to go with standard and admin that could have some alternative access. 
+
+## Conclusion
+
+Sammit challenged me in a wide range of ways. This was my first Rails application so it was my first time playing within the framework. Beyond that, I was pushing myself to use a large set of new gems and technologies that I had never worked with before. Unlike my experience with BlocChat where I was spending a decent bit of time focusing on the front-end styling, I almost completely disregarded that here in favor of focusing on the tech used. I have no doubts that my preference is to think about the functionality and the back end data interworkings instead of spending time on the HTML and scripting. 
