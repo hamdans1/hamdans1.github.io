@@ -519,3 +519,9 @@ I was very pleased with what I came up with for Sammit. I achieved all of my dev
 ## Conclusion
 
 Sammit challenged me in a wide range of ways. This was my first Rails application so it was my first time playing within the framework. Beyond that, I was pushing myself to use a large set of new gems and technologies that I had never worked with before. Unlike my experience with BlocChat where I was spending a decent bit of time focusing on the front-end styling, I almost completely disregarded that here in favor of focusing on the tech used. I have no doubts that my preference is to think about the functionality and the back end data interworkings instead of spending time on the HTML and scripting. 
+
+If you don't want to fork the repo and take a look under the hood, you can poke around Sammit on via heroku using this link:
+
+[heroku link](https://pure-cliffs-33222.herokuapp.com "Sammit")
+
+Thanks so much for reading and I hoped you learned something from my work here!
