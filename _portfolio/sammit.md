@@ -6,7 +6,7 @@ short-description: Sammit is a Reddit replica I built to learn the fundamentals 
 ---
 
 {:.center}
-![]({{ site.basurl }}/img/Sammit/Sammit-Frontpage.png)
+![]({{ site.baseurl }}/img/Sammit/Sammit-Frontpage.png)
 
 ## What is Sammit?
 
