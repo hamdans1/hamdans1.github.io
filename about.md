@@ -14,6 +14,3 @@ After the campaign finished I started putting things into motion to sell my busi
 After I sold the business I started making moves towards a coding bootcamp. I took the two week App Academy prep course to see if that would be a fit, and I played with the idea of General Assembly.  Neither of these felt right though. I didn't like the idea of spending quite that much money when I already had a decent foundation, and I wanted the schedule flexibility of an online program. The Web Developer program at Bloc turned out to be a perfect fit for what I wanted.
 
 That brings me here now. I'm looking for my first job as a junior developer. My ideal job is to work somewhere that is building bold and innovative tech, wants to teach young developers, and has a strong culture. There's nothing I want more than full immersion in this world because I only want to get better and better. I know that I am a fast learner and I can thrive in the right environment. I have so many ideas and concepts that I want to learn how to implement, and I have a unique balance of work ethic and soft skills that might not be a regular feature of people employed in this field.
-
-<iframe src="https://resume.creddle.io/embed/25suyu90jto"
-  width="850" height="1100" seamless></iframe> 
