@@ -15,5 +15,7 @@ After I sold the business I started making moves towards a coding program. I too
 
 That brings me to now. I'm looking for my first job as a developer. My ideal job is to work somewhere that is building bold and innovative tech, trusts its developers with important work and feedback, and has a strong team culture. My ideal scenario is a place where I am knee deep in the work every day, constantly getting stronger. I know that I am a fast learner and I can thrive in the right environment. I have so many ideas and concepts that I want to learn how to implement, and I have a unique balance of work ethic and soft skills that might not be a regular feature of people employed in this field. I can't wait to see where my road takes me next. 
 
+[Link to My CV](https://resume.creddle.io/embed/25suyu90jto)
+
 <iframe src="https://resume.creddle.io/embed/25suyu90jto"
   width="850" height="1100" seamless></iframe>
