@@ -31,3 +31,27 @@ I needed to build an API that would be able to return data, as well as CRUD func
 5. I wanted users to be able to update lists and items form the command line.
 
 ### User Story 1: Serialization
+
+My first step was making sure my application would be able to return JSON representations of users, lists, and items after I created them. So first I had to generate models for each, and create the necessary data relationship between them.
+
+After that, I would need the necessary serializers to return the formatted responses that could be read, generated, and parsed. I bundle installed the Active Model Serializer gem, and used the Rails generator to create a serializer. 
+
+Once I generated the serializer I added whatever attribues I wanted serialized, in this case I didn't have a need to create any faux-attributes or variations and I just wanted to return the base attributes associated with each model. 
+
+```ruby
+class UserSerializer < ActiveModel::Serializer
+  attributes :id, :email, :created_at
+
+end
+```
+
+I should note here that I created the serializers knowing that I would want to build out an API controller to allow authentication and access from the command line. This is probably a seriazliers best use. 
+
+Now to make sure the serializer was working I created myself as a User and ran the following from my Rails console: 
+`puts JSON.pretty_generate(UserSerializer.new(User.first).as_json)`
+
+And I got this in return: 
+![User Serializer Response](/img/get-it-done/User Serializer Test.png)
+
+### User Story 2: Authentication
+
