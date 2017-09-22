@@ -48,10 +48,49 @@ end
 I should note here that I created the serializers knowing that I would want to build out an API controller to allow authentication and access from the command line. This is probably a seriazliers best use. 
 
 Now to make sure the serializer was working I created myself as a User and ran the following from my Rails console: 
-`puts JSON.pretty_generate(UserSerializer.new(User.first).as_json)`
+```ruby
+> puts JSON.pretty_generate(UserSerializer.new(User.first).as_json)
+```
 
 And I got this in return: 
 ![User Serializer Response](/img/get-it-done/User Serializer Test.png)
 
 ### User Story 2: Authentication
+
+I next wanted to authenticate users from the command line, so I needed a Users Controller. I created a base API controller from which my other controllers could inherit. To my API controller I added a private #authenticated? method:
+
+```ruby
+class ApiController < ApplicationController
+    skip_before_action :verify_authencity_token
+    
+    private
+    
+    def authenticated?
+        authenticate_or_request_with_http_basic{|email, password_digest| User.where(email: email, password_digest: password_digest).present?}
+    end
+end
+```
+I edited my routes to make sure that I had an API route that my users would run through, and that my API route had a separate namespace and would support JSON requests. 
+
+```ruby
+  namespace :api, defaults: { format: :json } do
+    resources :users do
+    ...
+```
+Lastly, I got back to the business of my Users Controller, making sure it inherited from my API Controller and had an index method that would return a JSON representation of all users using the User Serializer.
+
+```ruby
+    def index
+        users = User.all
+        render json: users, each_serializer: UserSerializer
+    end
+```
+
+From there I ran a curl request from my command line, while running the application from the c9 server.
+`$ curl -u samihamdan00@gmail.com:password https://get-it-done-hamdans1.c9users.io/api/users`
+
+![User Index Authentication](/img/get-it-done/Authentication User Index.png)
+
+
+### User Story 3: Create from Command Line
 
