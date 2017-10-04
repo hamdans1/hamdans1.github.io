@@ -17,4 +17,4 @@ That brings me to now. I'm looking for my first job as a developer. My ideal job
 
 [Link to My CV](https://represent.io/hamdans1)
 
-[CV](/img/CV Screenshot.png)
+![CV](/img/CV Screenshot.png)
