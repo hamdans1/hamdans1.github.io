@@ -36,22 +36,22 @@ Before I could get started with building out the application, I had to come up w
 3. I want to seed data on my development database to make sure my views are rendering correctly.
 4. I want users to be able to perform CRUD operations on our models.
 5. I want users to be able to sign up, sign in, and sign out using authenticated usernames and passwords.
-6. I want to implement a session controller to determine when and what user is signed in. 
+6. I want to implement a session controller to determine when and what user is signed in.
 7. I want to create a data association between users, posts, and comments.
 8. I want to create authorized roles within the application, and allow for admins to create topics.
-9. I want to implement a Vote model to allow users to upvote and downvote different posts, topics, and comments. 
+9. I want to implement a Vote model to allow users to upvote and downvote different posts, topics, and comments.
 10. I want to implement a Favorite model to allow users to tag posts as and get an email after a comment is made on a favorite post.
-11. I want users to have a viewable public profile. 
+11. I want users to have a viewable public profile.
 
 ### User Story 1: Post Model
 
 My first step was to create a Post model. Easy enough, I used the rails generator and ran:
 `$ rails generate model Post title:string body:text`
-This gave me a post.rb, post_spec.rb, and a db file for creating posts. Running `rake db:migrate` gave me a schema file and we are off to the races. 
+This gave me a post.rb, post_spec.rb, and a db file for creating posts. Running `rake db:migrate` gave me a schema file and we are off to the races.
 
 ### User Story 2: Comment Model and Post relationship
 
-Setting up my Comment model was similar to setting up a Post model, but I also wanted to add a reference to the Post model within the Comment table. 
+Setting up my Comment model was similar to setting up a Post model, but I also wanted to add a reference to the Post model within the Comment table.
 `$ rails generate model Comment body:text post:references`
 
 Within comment.rb I added a line to associate comments to posts:
@@ -63,7 +63,7 @@ Again I ran `$ rake db:migrate` here to add comments to my database.
 
 ### User Story 3: Seeding Data
 
-So now I wanted to see if my models are working properly and prepare my application for developing CRUD controllers. I know that I need to seed data so I can view the database inside the Rails console. 
+So now I wanted to see if my models are working properly and prepare my application for developing CRUD controllers. I know that I need to seed data so I can view the database inside the Rails console.
 
 First, I created a file `lib/random_data.rb`. Within this file I created a module that held three methods for creating fake data.
 
@@ -74,30 +74,30 @@ module RandomData
         last_name = random_word.capitalize
         "#{first_name} #{last_name}"
     end
-    
+
     def self.random_email
         "#{random_word}@#{random_word}.#{random_word}"
     end
-    
+
     def self.random_paragraph
         sentences = []
         rand(4..6).times do
             sentences << random_sentence
         end
-        
+
         sentences.join(" ")
     end
-    
+
     def self.random_sentence
         strings = []
         rand(3..8).times do
             strings << random_word
         end
-        
+
         sentence = strings.join(" ")
         sentence.capitalize << "."
     end
-    
+
     def self.random_word
         letters = ('a'..'z').to_a
         letters.shuffle!
@@ -126,11 +126,11 @@ After that I made sure to make my random_data file accessible to the rest of my 
 
 ### User Story 4: CRUD Ops
 
-To implement CRUD (Create, Read, Update, Destroy) operations, I would need to generate resources for Post and Comment. First I generated a Post controller using: 
+To implement CRUD (Create, Read, Update, Destroy) operations, I would need to generate resources for Post and Comment. First I generated a Post controller using:
 `$ rails generate controller posts index show new edit`
 Then I went into my config/routes.rb file and refactored my post routes to:
 `resources :posts`
-After that I added methods to my PostsController for #index, #create, #new, and #edit. With those methods completed, I edited the views that corresponded to the controller actions. 
+After that I added methods to my PostsController for #index, #create, #new, and #edit. With those methods completed, I edited the views that corresponded to the controller actions.
 
 ```ruby
  def show
@@ -144,11 +144,11 @@ After that I added methods to my PostsController for #index, #create, #new, and 
   def edit
     @post = Post.find(params[:id])
   end
-  
+
   def create
     @post = Post.new
     @post.user = current_user
-    
+
     if @post.save
       flash[:notice] = "Post was saved"
       redirect_to [@topic, @post]
@@ -164,9 +164,9 @@ After that I added methods to my PostsController for #index, #create, #new, and 
 
 I wanted to develop a custom authentication system rather then use Devise or OmniAuth or any of the other authentication gems available. I chose the custom path because it would give me a better understanding of the relationships and better control over the User resources.
 
-First I generated a user model with name, email, and password_digest attributes and ran db:migrate. I bundle installed 'BCrypt' to handle my password encryption needs, and added a #hasSecurePassword method to my User model. 
+First I generated a user model with name, email, and password_digest attributes and ran db:migrate. I bundle installed 'BCrypt' to handle my password encryption needs, and added a #hasSecurePassword method to my User model.
 
-Once that was set up I created a UsersController with CRUD ops, and created resources on my routes.rb. The last piece for my users was setting up views so that users could sign up, sign in, and sign out. I added those link options my application layout, as I wanted them to be ever present. 
+Once that was set up I created a UsersController with CRUD ops, and created resources on my routes.rb. The last piece for my users was setting up views so that users could sign up, sign in, and sign out. I added those link options my application layout, as I wanted them to be ever present.
 
 ```ruby
 <div class="container">
@@ -191,16 +191,16 @@ Once that was set up I created a UsersController with CRUD ops, and created reso
 
 ### User Story 6: Sessions Controller
 
-  I want to require my user data to persist while they are 'signed in'. To do that I would need a sessions controller that would store data in a user client's cookies. I also wanted to create helper methods like #current_user that would be useful for things like authorization down the road. 
+  I want to require my user data to persist while they are 'signed in'. To do that I would need a sessions controller that would store data in a user client's cookies. I also wanted to create helper methods like #current_user that would be useful for things like authorization down the road.
 
-  I generated a sessions controller with create and destroy methods, and I created a sessions_helper with several other methods that would be necessary. 
+  I generated a sessions controller with create and destroy methods, and I created a sessions_helper with several other methods that would be necessary.
 
   ```ruby
   class SessionsController < ApplicationController
-    
+
     def create
         user = User.find_by(email: params[:session][:email].downcase)
-        
+
         if user && user.authenticate(params[:session][:password])
             create_session(user)
             flash[:notice] = "Welcome, #{user.name}"
@@ -210,42 +210,42 @@ Once that was set up I created a UsersController with CRUD ops, and created reso
             render :new
         end
     end
-    
+
     def destroy
         destroy_session(current_user)
         flash[:notice] = "You've been signed out, come back soon!"
         redirect_to root_path
     end
-    
+
 end
 ```
 ```ruby
 module SessionsHelper
-    
+
     def create_session(user)
         session[:user_id] = user.id
     end
-    
+
     def destroy_session(user)
         session[:user_id] = nil
     end
-    
+
     def current_user
         User.find_by(id: session[:user_id])
     end
-    
+
 end
 ```
 
 ### User Story 7: Data Association
 
-I already have an association between Comments and Posts, but now I need to integrate users into the mix.  To do this I need to run a new migration that will add a Users column to my Posts table, and I need to declare those associations within the models. 
+I already have an association between Comments and Posts, but now I need to integrate users into the mix.  To do this I need to run a new migration that will add a Users column to my Posts table, and I need to declare those associations within the models.
 
 Running the migration was as simple as:
 `$ rails g migration AddUserToPosts user_id:integer:index`
 and then running `$ rake db:migrate`.
 
-After that I updated the models to include the same associations I used for Posts and Comments. 
+After that I updated the models to include the same associations I used for Posts and Comments.
 
 ### User Story 8: Authorization and Topics
 
@@ -263,7 +263,7 @@ Creating topics would also require me to start nesting my routes, because I didn
   end
 ```
 
-After creating my topics and editing my routes, I wanted to be sure to add an authorization mechanic to my users. This was as simple as adding `enum role: [:member, :admin]` to my User model.  This associated a role with a number to allow for easier reference. Then I ran a rails migration for AddRoleToUsers and I was set. 
+After creating my topics and editing my routes, I wanted to be sure to add an authorization mechanic to my users. This was as simple as adding `enum role: [:member, :admin]` to my User model.  This associated a role with a number to allow for easier reference. Then I ran a rails migration for AddRoleToUsers and I was set.
 
 ![Topics index view](/img/Sammit/Sammit-Topics.png)
 
@@ -275,17 +275,17 @@ Like Reddit, I wanted to implement some sort of voting structure so that I could
 
 First I generated the model using ` $ rails g model Vote value:integer user:references:index post:references:index`.
 
-Then I updated my three relevant models to include hasMany and belongsTo associations between the three. Once I had done that I could implement #upVotes, #downVotes, and #points methods in my Post model. These were relatively simple methods using `where(value:).count` to assign votes, and `.sum(:value)` to call points. 
+Then I updated my three relevant models to include hasMany and belongsTo associations between the three. Once I had done that I could implement #upVotes, #downVotes, and #points methods in my Post model. These were relatively simple methods using `where(value:).count` to assign votes, and `.sum(:value)` to call points.
 
 ```ruby
     def up_votes
         votes.where(value:1).count
     end
-    
+
     def down_votes
         votes.where(value:-1).count
     end
-    
+
     def points
         votes.sum(:value)
     end
@@ -298,73 +298,73 @@ Rails.application.routes.draw do
   resources :topics do
     resources :posts, except: [:index]
   end
-  
-  
+
+
   resources :posts, only: [] do
     resources :comments, only: [:create, :destroy]
-    
+
     post '/up-vote' => 'votes#up_vote', as: :up_vote
     post '/down-vote' => 'votes#down_vote', as: :down_vote
   end
-  
+
   resources :users, only: [:new, :create, :show]
-  
+
   resources :sessions, only: [:new, :create, :destroy]
 
   get 'about' => 'welcome#about'
 
   root 'welcome#index'
-  
+
 end
 ```
 
-I included two methods for upVote and downVote in my votes controller that both called on a private method for updateVote. 
+I included two methods for upVote and downVote in my votes controller that both called on a private method for updateVote.
 
 ```ruby
 class VotesController < ApplicationController
     before_action :require_sign_in
-    
+
     def up_vote
         update_vote(1)
         redirect_to :back
     end
-    
+
     def down_vote
         update_vote(-1)
         redirect_to :back
     end
-    
+
     private
-    
+
     def update_vote(new_value)
         @post = Post.find(params[:post_id])
         @vote = @post.votes.where(user_id: current_user.id).first
-        
+
         if @vote
             @vote.update_attribute(:value, new_value)
         else
             @vote = current_user.votes.create(value: new_value, post: @post)
         end
     end
-    
+
 end
 ```
-The last piece to the puzzle was implementing the ranking system. My first step was to add a rank attribute to my Post table and migrate. I added an afterSave callback method to my Vote model and a private updatePost method. 
+The last piece to the puzzle was implementing the ranking system. My first step was to add a rank attribute to my Post table and migrate. I added an afterSave callback method to my Vote model and a private updatePost method.
 
 ```ruby
 class Vote < ActiveRecord::Base
   belongs_to :user
   belongs_to :post
   after_save :update_post
-  
+
   validates :value, inclusion: { in: [-1,1], message: "%{value} is not a valid vote."}, presence: true
-  
+
   private
-  
+
   def update_post
     post.update_rank
   end
-  
+
 end
 ```
 
@@ -386,9 +386,9 @@ end
 
 ### User Story 10: Favoriting and ActiveMailer
 
-In addition to the vote system, I wanted users to be able to tag a post as a favorite and be notified when a post receives a new comment. I need to generate a model that would track which posts a user has favorited. I need to add a 'favorite' button on posts that would allow users to flag a favorite. Finally I wanted to add a notification feature that sent an email to users when one of their favorited posts got a new comment. 
+In addition to the vote system, I wanted users to be able to tag a post as a favorite and be notified when a post receives a new comment. I need to generate a model that would track which posts a user has favorited. I need to add a 'favorite' button on posts that would allow users to flag a favorite. Finally I wanted to add a notification feature that sent an email to users when one of their favorited posts got a new comment.
 
-Generating the model was simple enough. My model wouldn't need any unique attributes as it would only need to references users and posts. The model would also require a 'belongs_to' association with both users and posts. 
+Generating the model was simple enough. My model wouldn't need any unique attributes as it would only need to references users and posts. The model would also require a 'belongs_to' association with both users and posts.
 
 I then added a #favoriteFor method on my User model that would determine if a post had been favorited by a user.
 
@@ -412,41 +412,41 @@ My next step was to generate a FavoritesController and edit my route resources. 
 <% end %>
 ```
 
-I wanted Sammit to send an email when a favorited post received a new comment, to do that I installed SendGrid via heroku.  After attaching my Heroku login to SendGrid I edited my enivornment configs and added a setup_mail initializer. To protect sensitive data in my config files from being accessible on GitHub, I decided to use the Figaro gem. 
+I wanted Sammit to send an email when a favorited post received a new comment, to do that I installed SendGrid via heroku.  After attaching my Heroku login to SendGrid I edited my enivornment configs and added a setup_mail initializer. To protect sensitive data in my config files from being accessible on GitHub, I decided to use the Figaro gem.
 
-The final step would be implementing a Favorite mailer. I used `$ rails generate mailer Favorite Mailer` to create my mailer. I set my personal email as the default email address and added two methods: newComment would send when a favorited post received a new comment, and newPost would send when a favorited user posted a new post. I also made sure when creating my corresponding favorite mailer views to use both html and plain text to support all email clients. 
+The final step would be implementing a Favorite mailer. I used `$ rails generate mailer Favorite Mailer` to create my mailer. I set my personal email as the default email address and added two methods: newComment would send when a favorited post received a new comment, and newPost would send when a favorited user posted a new post. I also made sure when creating my corresponding favorite mailer views to use both html and plain text to support all email clients.
 
 ```ruby
 class FavoriteMailer < ApplicationMailer
     default from: "samihamdan00@gmail.com"
-    
+
     def new_comment(user, post, comment)
-        
+
         headers["Message-ID"] = "<comments/#{comment.id}@pure-cliffs-33222.herokuapp.com>"
         headers["In-Reply-To"] = "<post/#{post.id}@pure-cliffs-33222.herokuapp.com>"
         headers["References"] = "<post/#{post.id}@pure-cliffs-33222.herokuapp.com>"
-        
+
         @user = user
         @post = post
         @comment = comment
-        
+
         mail(to: user.email, subject: "New comment on #{post.title}")
     end
-    
+
     def new_post(post)
-        
+
         headers["Message-ID"] = "<posts/#{post.id}@pure-cliffs-33222.herokuapp.com"
         headers["In-Reply-To"] = "<post/#{post.id}@pure-cliffs-33222.herokuapp.com>"
         headers["References"] = "<post/#{post.id}@pure-cliffs-33222.herokuapp.com>"
-        
+
         @post = post
-        
+
         mail(to: post.user.email, subject: "You're following #{post.title}")
     end
-    
+
 end
 ```
-Finally I added a private callback to my Comment model to handle repeat functions and I added a favoritePost function to my Post model to handle favorite creation. 
+Finally I added a private callback to my Comment model to handle repeat functions and I added a favoritePost function to my Post model to handle favorite creation.
 
 ```ruby
     def favorite_for(post)
@@ -462,9 +462,9 @@ Finally I added a private callback to my Comment model to handle repeat function
 ![Sammit Post view with Favorites](/img/Sammit/Sammit-My Post.png)
 
 ### User Story 11: User Profiles
-The last piece I wanted to implement was a user profile. I wanted users to be able to publicly share their Sammit contributions by displaying basic user info and a list of posts and comments. I needed to develop a #show method on my UsersController and build out the corresponding view. I also wanted to implement gravatar functionality so that users would have a picture id on their profile and around their login info. 
+The last piece I wanted to implement was a user profile. I wanted users to be able to publicly share their Sammit contributions by displaying basic user info and a list of posts and comments. I needed to develop a #show method on my UsersController and build out the corresponding view. I also wanted to implement gravatar functionality so that users would have a picture id on their profile and around their login info.
 
-I used my #show method to assign instance variables for @user and @posts that I could call on my show view. 
+I used my #show method to assign instance variables for @user and @posts that I could call on my show view.
 ```ruby
     def show
         @user = User.find(params[:id])
@@ -478,7 +478,7 @@ I implemented gravatar by adding a #avatar_url method on my User model. Followin
         "http://gravatar.com/avatar/#{gravatar_id}.png?s=#{size}"
     end
 ```
-Finally, I updated my show view so that it would display the users gravatar, their post history, and their comment history. 
+Finally, I updated my show view so that it would display the users gravatar, their post history, and their comment history.
 ```ruby
 <div class="row">
     <div class="col-md-8">
@@ -511,14 +511,15 @@ Finally, I updated my show view so that it would display the users gravatar, the
 
 ## Results
 
-An important note here, throughout this process I was first developing each step using TDD and rspec. I chose not to include these steps here in my user stories because I didn't want the length to get too carried away. All of my spec files and the rest of Sammit can be found on the public Github repo. 
+An important note here, throughout this process I was first developing each step using TDD and RSpec. I chose not to include these steps here in my user stories because I didn't want the length to get too carried away. All of my spec files and the rest of Sammit can be found on the public Github repo. 
+<br>
 [Github Repo](https://github.com/hamdans1/bloccit)
 
-I was very pleased with what I came up with for Sammit. I achieved all of my development goals from when I started out. In the future I'd like to return to update some of the wireframes and stylesheets for the application to see what I could make it look like. I might also return to add some different features like a TipJar(reddit gold) or a premium role to go with standard and admin that could have some alternative access. 
+I was very pleased with what I came up with for Sammit. I achieved all of my development goals from when I started out. In the future I'd like to return to update some of the wireframes and stylesheets for the application to see what I could make it look like. I might also return to add some different features like a TipJar(reddit gold) or a premium role to go with standard and admin that could have some alternative access.
 
 ## Conclusion
 
-Sammit challenged me in a wide range of ways. This was my first Rails application so it was my first time playing within the framework. Beyond that, I was pushing myself to use a large set of new gems and technologies that I had never worked with before. Unlike my experience with BlocChat where I was spending a decent bit of time focusing on the front-end styling, I almost completely disregarded that here in favor of focusing on the tech used. I have no doubts that my preference is to think about the functionality and the back end data interworkings instead of spending time on the HTML and scripting. 
+Sammit challenged me in a wide range of ways. This was my first Rails application so it was my first time playing within the framework. Beyond that, I was pushing myself to use a large set of new gems and technologies that I had never worked with before. Unlike my experience with BlocChat where I was spending a decent bit of time focusing on the front-end styling, I almost completely disregarded that here in favor of focusing on the tech used. I have no doubts that my preference is to think about the functionality and the back end data interworkings instead of spending time on the HTML and scripting.
 
 If you don't want to fork the repo and take a look under the hood, you can poke around Sammit on via heroku using this link:
 

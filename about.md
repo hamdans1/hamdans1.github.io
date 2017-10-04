@@ -17,5 +17,4 @@ That brings me to now. I'm looking for my first job as a developer. My ideal job
 
 [Link to My CV](https://represent.io/hamdans1)
 
-<iframe src="https://represent.io/hamdans1"
-  width="850" height="1100" seamless></iframe>
+[CV pdf](/img/Sami Hamdan Full Stack CV.pdf)
